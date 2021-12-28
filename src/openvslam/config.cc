@@ -3,6 +3,7 @@
 #include "openvslam/camera/fisheye.h"
 #include "openvslam/camera/equirectangular.h"
 #include "openvslam/camera/radial_division.h"
+#include "openvslam/marker_model/aruco.h"
 #include "openvslam/util/string.h"
 #include "openvslam/util/yaml.h"
 
@@ -76,6 +77,25 @@ config::config(const YAML::Node& yaml_node, const std::string& config_file_path)
             orb_params_ = nullptr;
         }
         throw;
+    }
+
+    //========================//
+    // Load Marker Parameters //
+    //========================//
+
+    auto marker_model_yaml_node = yaml_node_["MarkerModel"];
+    if (marker_model_yaml_node) {
+        spdlog::debug("load marker model parameters");
+        auto marker_model_type = marker_model_yaml_node["type"].as<std::string>();
+        if (marker_model_type == "aruco") {
+            marker_model_ = std::make_shared<marker_model::aruco>(
+                marker_model_yaml_node["width"].as<double>(),
+                marker_model_yaml_node["marker_size"].as<double>(),
+                marker_model_yaml_node["max_markers"].as<double>());
+        }
+        else {
+            throw std::runtime_error("Invalid marker model type :" + marker_model_type);
+        }
     }
 }
 

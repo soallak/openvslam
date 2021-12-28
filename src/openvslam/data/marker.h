@@ -6,6 +6,10 @@
 #include <Eigen/Core>
 
 namespace openvslam {
+namespace marker_model {
+class base;
+}
+
 namespace data {
 
 class keyframe;
@@ -15,7 +19,7 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     //! constructor
-    marker(const eigen_alloc_vector<Vec3_t>& corners_pos_w, unsigned int id);
+    marker(const eigen_alloc_vector<Vec3_t>& corners_pos_w, unsigned int id, const std::shared_ptr<marker_model::base>& marker_model);
 
     void set_corner_pos(const eigen_alloc_vector<Vec3_t>& corner_pos_w);
 
@@ -24,6 +28,9 @@ public:
 
     //! marker ID
     unsigned int id_;
+
+    //! marker model
+    std::shared_ptr<marker_model::base> marker_model_;
 
     //! observed keyframes
     std::vector<std::shared_ptr<keyframe>> observations_;
