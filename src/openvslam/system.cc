@@ -11,6 +11,8 @@
 #include "openvslam/data/map_database.h"
 #include "openvslam/data/bow_database.h"
 #include "openvslam/data/bow_vocabulary.h"
+#include "openvslam/data/marker2d.h"
+#include "openvslam/marker_detector/aruco.h"
 #include "openvslam/match/stereo.h"
 #include "openvslam/feature/orb_extractor.h"
 #include "openvslam/io/trajectory_io.h"
@@ -141,6 +143,16 @@ system::system(const std::shared_ptr<config>& cfg, const std::string& vocab_file
         extractor_right_ = new feature::orb_extractor(orb_params_, max_num_keypoints, mask_rectangles);
     }
 
+    if (cfg->marker_model_) {
+        if (marker_detector::aruco::is_valid()) {
+            spdlog::debug("marker detection: enabled");
+            marker_detector_ = new marker_detector::aruco(camera_, cfg->marker_model_);
+        }
+        else {
+            spdlog::warn("Valid marker_detector is not installed");
+        }
+    }
+
     // connect modules each other
     tracker_->set_mapping_module(mapper_);
     tracker_->set_global_optimization_module(global_optimizer_);
@@ -177,6 +189,9 @@ system::~system() {
     extractor_right_ = nullptr;
     delete ini_extractor_left_;
     ini_extractor_left_ = nullptr;
+
+    delete marker_detector_;
+    marker_detector_ = nullptr;
 
     delete orb_params_db_;
     orb_params_db_ = nullptr;
@@ -327,7 +342,13 @@ data::frame system::create_monocular_frame(const cv::Mat& img, const double time
     // Assign all the keypoints into grid
     data::assign_keypoints_to_grid(camera_, frm_obs.undist_keypts_, frm_obs.keypt_indices_in_cells_);
 
-    return data::frame(timestamp, camera_, orb_params_, frm_obs);
+    // Detect marker
+    std::unordered_map<unsigned int, data::marker2d> markers_2d;
+    if (marker_detector_) {
+        marker_detector_->detect(img_gray, markers_2d);
+    }
+
+    return data::frame(timestamp, camera_, orb_params_, frm_obs, std::move(markers_2d));
 }
 
 data::frame system::create_stereo_frame(const cv::Mat& left_img, const cv::Mat& right_img, const double timestamp, const cv::Mat& mask) {
@@ -373,7 +394,13 @@ data::frame system::create_stereo_frame(const cv::Mat& left_img, const cv::Mat& 
     // Assign all the keypoints into grid
     data::assign_keypoints_to_grid(camera_, frm_obs.undist_keypts_, frm_obs.keypt_indices_in_cells_);
 
-    return data::frame(timestamp, camera_, orb_params_, frm_obs);
+    // Detect marker
+    std::unordered_map<unsigned int, data::marker2d> markers_2d;
+    if (marker_detector_) {
+        marker_detector_->detect(img_gray, markers_2d);
+    }
+
+    return data::frame(timestamp, camera_, orb_params_, frm_obs, std::move(markers_2d));
 }
 
 data::frame system::create_RGBD_frame(const cv::Mat& rgb_img, const cv::Mat& depthmap, const double timestamp, const cv::Mat& mask) {
@@ -422,7 +449,14 @@ data::frame system::create_RGBD_frame(const cv::Mat& rgb_img, const cv::Mat& dep
 
     // Assign all the keypoints into grid
     data::assign_keypoints_to_grid(camera_, frm_obs.undist_keypts_, frm_obs.keypt_indices_in_cells_);
-    return data::frame(timestamp, camera_, orb_params_, frm_obs);
+
+    // Detect marker
+    std::unordered_map<unsigned int, data::marker2d> markers_2d;
+    if (marker_detector_) {
+        marker_detector_->detect(img_gray, markers_2d);
+    }
+
+    return data::frame(timestamp, camera_, orb_params_, frm_obs, std::move(markers_2d));
 }
 
 std::shared_ptr<Mat44_t> system::feed_monocular_frame(const cv::Mat& img, const double timestamp, const cv::Mat& mask) {
