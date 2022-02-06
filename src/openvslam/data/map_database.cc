@@ -3,6 +3,7 @@
 #include "openvslam/data/frame.h"
 #include "openvslam/data/keyframe.h"
 #include "openvslam/data/landmark.h"
+#include "openvslam/data/marker.h"
 #include "openvslam/data/camera_database.h"
 #include "openvslam/data/orb_params_database.h"
 #include "openvslam/data/map_database.h"
@@ -45,6 +46,28 @@ void map_database::add_landmark(std::shared_ptr<landmark>& lm) {
 void map_database::erase_landmark(unsigned int id) {
     std::lock_guard<std::mutex> lock(mtx_map_access_);
     landmarks_.erase(id);
+}
+
+void map_database::add_marker(const std::shared_ptr<marker>& mkr) {
+    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    markers_[mkr->id_] = mkr;
+}
+
+void map_database::erase_marker(const std::shared_ptr<marker>& mkr) {
+    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    markers_.erase(mkr->id_);
+}
+
+std::shared_ptr<marker> map_database::get_marker(unsigned int id) const {
+    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    std::shared_ptr<marker> mkr;
+    if (markers_.count(id) == 0) {
+        mkr = nullptr;
+    }
+    else {
+        mkr = markers_.at(id);
+    }
+    return mkr;
 }
 
 void map_database::set_local_landmarks(const std::vector<std::shared_ptr<landmark>>& local_lms) {
@@ -142,6 +165,21 @@ std::vector<std::shared_ptr<landmark>> map_database::get_all_landmarks() const {
 std::shared_ptr<keyframe> map_database::get_last_inserted_keyframe() const {
     std::lock_guard<std::mutex> lock(mtx_map_access_);
     return last_inserted_keyfrm_;
+}
+
+std::vector<std::shared_ptr<marker>> map_database::get_all_markers() const {
+    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    std::vector<std::shared_ptr<marker>> markers;
+    markers.reserve(markers_.size());
+    for (const auto id_marker : markers_) {
+        markers.push_back(id_marker.second);
+    }
+    return markers;
+}
+
+unsigned int map_database::get_num_markers() const {
+    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    return markers_.size();
 }
 
 unsigned int map_database::get_num_landmarks() const {
