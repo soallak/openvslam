@@ -13,7 +13,7 @@
     <license>2-clause BSD</license>
     <url type="website">https://openvslam-community.readthedocs.io/</url>
 
-    <buildtool_depend>cmake</buildtool_depend>
+    <buildtool_depend>ament_cmake</buildtool_depend>
 
     <depend>eigen</depend>
     <depend>libg2o</depend>
@@ -22,6 +22,6 @@
     <depend>yaml-cpp</depend>
 
     <export>
-        <build_type>cmake</build_type>
+        <build_type>ament_cmake</build_type>
     </export>
 </package>

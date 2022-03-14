@@ -74,7 +74,8 @@ void landmark::erase_observation(map_database* map_db, const std::shared_ptr<key
             observations_.erase(keyfrm);
 
             if (ref_keyfrm_.lock() == keyfrm) {
-                ref_keyfrm_ = observations_.begin()->first;
+                if (observations_.begin() != observations_.end())
+                    ref_keyfrm_ = observations_.begin()->first;
             }
 
             if (num_observations_ <= 2) {

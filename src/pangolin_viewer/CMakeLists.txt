@@ -20,11 +20,16 @@ target_include_directories(pangolin_viewer
                            PUBLIC
                            ${Pangolin_INCLUDE_DIR})
 
+target_compile_definitions(pangolin_viewer
+                        PUBLIC 
+                          HAVE_GLEW
+                          HAVE_EIGEN)
+
 target_link_libraries(pangolin_viewer
                       PUBLIC
                       ${PROJECT_NAME}
                       opencv_highgui
-                      pangolin)
+                      ${Pangolin_LIBRARIES})
 
 # ----- Install configuration -----
 

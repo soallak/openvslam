@@ -11,6 +11,11 @@ if(POLICY CMP0074)
     cmake_policy(SET CMP0074 OLD)
 endif()
 
+
+if(POLICY CMP0057)
+    cmake_policy(SET CMP0057 NEW)
+endif()
+
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 # ----- Set build type -----
@@ -82,6 +87,8 @@ else()
 endif()
 
 # ----- Find dependencies -----
+
+find_package(ament_cmake REQUIRED)
 
 # Threads
 find_package(Threads REQUIRED)
@@ -159,3 +166,5 @@ if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(test)
 endif()
+
+ament_package()
