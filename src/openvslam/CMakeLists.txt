@@ -20,6 +20,8 @@ find_package(g2o REQUIRED
              OPTIONAL_COMPONENTS
              g2o::csparse)
 
+find_package(slam_tracepoint_provider REQUIRED)
+
 # Check first if CSparse is built from g2o
 if(TARGET g2o::csparse)
     set(${CXSPARSE_LIBRARIES} g2o::csparse)
@@ -156,7 +158,9 @@ target_link_libraries(${PROJECT_NAME}
                       ${SUITESPARSE_LIBRARIES}
                       ${BoW_LIBRARY}
                       PRIVATE
-                      ${LAPACK_LIBRARIES})
+                      ${LAPACK_LIBRARIES}
+                      slam_tracepoint_provider::slam_tracepoint_provider
+                      )
 
 # ----- Install configuration -----
 

@@ -21,9 +21,18 @@
 #include "openvslam/util/image_converter.h"
 #include "openvslam/util/yaml.h"
 
+#include <string>
 #include <thread>
+#include <chrono>
 
 #include <spdlog/spdlog.h>
+
+// clang-format off
+// todo: make this conditional at compile time
+#define LTTNG_UST_TRACEPOINT_DEFINE
+#define LTTNG_UST_TRACEPOINT_PROBE_DYNAMIC_LINKAGE
+#include <slam_tracepoint_provider/tracepoint.hpp>
+// clang-format on
 
 namespace {
 using namespace openvslam;
@@ -332,10 +341,19 @@ data::frame system::create_monocular_frame(const cv::Mat& img, const double time
 
 data::frame system::create_stereo_frame(const cv::Mat& left_img, const cv::Mat& right_img, const double timestamp, const cv::Mat& mask) {
     // color conversion
+
+    auto now = std::chrono::steady_clock::now;
+
+    auto start = now();
+
     cv::Mat img_gray = left_img;
     cv::Mat right_img_gray = right_img;
     util::convert_to_grayscale(img_gray, camera_->color_order_);
     util::convert_to_grayscale(right_img_gray, camera_->color_order_);
+
+    auto end = now();
+
+    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:grayscale_conversion");
 
     data::frame_observation frm_obs;
     //! keypoints of stereo right image
@@ -344,6 +362,7 @@ data::frame system::create_stereo_frame(const cv::Mat& left_img, const cv::Mat& 
     cv::Mat descriptors_right;
 
     // Extract ORB feature
+    start = now();
     std::thread thread_left([this, &frm_obs, &img_gray, &mask]() {
         extractor_left_->extract(img_gray, mask, frm_obs.keypts_, frm_obs.descriptors_);
     });
@@ -352,26 +371,40 @@ data::frame system::create_stereo_frame(const cv::Mat& left_img, const cv::Mat& 
     });
     thread_left.join();
     thread_right.join();
+    end = now();
+    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:orb_feature_extraction");
     frm_obs.num_keypts_ = frm_obs.keypts_.size();
     if (frm_obs.keypts_.empty()) {
         spdlog::warn("preprocess: cannot extract any keypoints");
     }
 
     // Undistort keypoints
+    start = now();
     camera_->undistort_keypoints(frm_obs.keypts_, frm_obs.undist_keypts_);
+    end = now();
+    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:keypoints_undistortion");
 
     // Estimate depth with stereo match
+    start = now();
     match::stereo stereo_matcher(extractor_left_->image_pyramid_, extractor_right_->image_pyramid_,
                                  frm_obs.keypts_, keypts_right, frm_obs.descriptors_, descriptors_right,
                                  orb_params_->scale_factors_, orb_params_->inv_scale_factors_,
                                  camera_->focal_x_baseline_, camera_->true_baseline_);
     stereo_matcher.compute(frm_obs.stereo_x_right_, frm_obs.depths_);
+    end = now();
+    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:stereo_matching");
 
     // Convert to bearing vector
+    start = now();
     camera_->convert_keypoints_to_bearings(frm_obs.undist_keypts_, frm_obs.bearings_);
+    end = now();
+    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:keypoints_to_bearings_conversion");
 
     // Assign all the keypoints into grid
+    start = now();
     data::assign_keypoints_to_grid(camera_, frm_obs.undist_keypts_, frm_obs.keypt_indices_in_cells_);
+    end = now();
+    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:keypoints_to_grid_assignment");
 
     return data::frame(timestamp, camera_, orb_params_, frm_obs);
 }
@@ -432,7 +465,8 @@ std::shared_ptr<Mat44_t> system::feed_monocular_frame(const cv::Mat& img, const 
 
 std::shared_ptr<Mat44_t> system::feed_stereo_frame(const cv::Mat& left_img, const cv::Mat& right_img, const double timestamp, const cv::Mat& mask) {
     assert(camera_->setup_type_ == camera::setup_type_t::Stereo);
-    return feed_frame(create_stereo_frame(left_img, right_img, timestamp, mask), left_img);
+    auto&& frame = create_stereo_frame(left_img, right_img, timestamp, mask);
+    return feed_frame(frame, left_img);
 }
 
 std::shared_ptr<Mat44_t> system::feed_RGBD_frame(const cv::Mat& rgb_img, const cv::Mat& depthmap, const double timestamp, const cv::Mat& mask) {
@@ -443,17 +477,19 @@ std::shared_ptr<Mat44_t> system::feed_RGBD_frame(const cv::Mat& rgb_img, const c
 std::shared_ptr<Mat44_t> system::feed_frame(const data::frame& frm, const cv::Mat& img) {
     check_reset_request();
 
-    const auto start = std::chrono::system_clock::now();
+    const auto start = std::chrono::steady_clock::now();
 
     const auto cam_pose_wc = tracker_->feed_frame(frm);
 
-    const auto end = std::chrono::system_clock::now();
+    auto end = std::chrono::steady_clock::now();
     double elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
     frame_publisher_->update(tracker_, img, elapsed_ms);
     if (tracker_->tracking_state_ == tracker_state_t::Tracking && cam_pose_wc) {
         map_publisher_->set_current_cam_pose(util::converter::inverse_pose(*cam_pose_wc));
     }
+    end = std::chrono::steady_clock::now();
+    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:tracking");
 
     return cam_pose_wc;
 }
