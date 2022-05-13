@@ -152,8 +152,8 @@ target_link_libraries(${PROJECT_NAME}
                       g2o::types_sim3
                       g2o::solver_dense
                       g2o::solver_eigen
-                      g2o::solver_csparse
-                      g2o::csparse_extension
+                      #g2o::solver_csparse
+                      #g2o::csparse_extension
                       ${CXSPARSE_LIBRARIES}
                       ${SUITESPARSE_LIBRARIES}
                       ${BoW_LIBRARY}
