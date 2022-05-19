@@ -2,6 +2,7 @@
 # json
 set(json_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/3rd/json/include)
 
+find_package(Eigen3 3.3 REQUIRED)
 # g2o
 find_package(g2o REQUIRED
              COMPONENTS
@@ -149,7 +150,7 @@ target_link_libraries(${PROJECT_NAME}
                       g2o::solver_dense
                       g2o::solver_eigen
                       #g2o::solver_csparse
-                      #g2o::csparse_extension
+                      g2o::csparse_extension
                       ${CXSPARSE_LIBRARIES}
                       ${SUITESPARSE_LIBRARIES}
                       ${BoW_LIBRARY}

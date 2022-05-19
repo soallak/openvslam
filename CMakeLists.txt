@@ -27,14 +27,47 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 option(BUILD_SHARED_LIBS "Build OpenVSLAM as a shared library" ON)
 
+# ----- Find dependencies -----
+
+find_package(ament_cmake REQUIRED)
+
+# Threads
+find_package(Threads REQUIRED)
+
+# OpenMP
+find_package(OpenMP REQUIRED)
+if(NOT TARGET OpenMP::OpenMP_CXX)
+  add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)
+  set_property(
+    TARGET OpenMP::OpenMP_CXX PROPERTY INTERFACE_LINK_LIBRARIES
+                                       ${OpenMP_CXX_FLAGS} Threads::Threads)
+endif()
+
+# Eigen
+find_package(Eigen3 3.3 REQUIRED)
+
+# OpenCV
+find_package(OpenCV 3.3.1 QUIET COMPONENTS core imgcodecs videoio features2d
+                                           calib3d highgui)
+if(NOT OpenCV_FOUND)
+  find_package(OpenCV 4.0 REQUIRED COMPONENTS core imgcodecs videoio features2d
+                                              calib3d highgui)
+  if(NOT OpenCV_FOUND)
+    message(FATAL_ERROR "OpenCV >= 3.3.1 not found")
+  endif()
+endif()
+message(STATUS "Use OpenCV ${OpenCV_VERSION}")
+
 # ----- Build selection -----
+find_package(Pangolin QUIET)
 
 set(USE_PANGOLIN_VIEWER
-    OFF
-    CACHE BOOL "Enable Pangolin Viewer")
+  ${Pangolin_FOUND}
+  CACHE BOOL "Enable Pangolin Viewer")
 set(INSTALL_PANGOLIN_VIEWER
-    OFF
-    CACHE BOOL "Install PangolinViewer library")
+  ${Pangolin_FOUND}
+  CACHE BOOL "Install PangolinViewer library")
+
 set(USE_SOCKET_PUBLISHER
     OFF
     CACHE BOOL "Enable Socket Publisher")
@@ -122,36 +155,7 @@ else()
   message(STATUS "Architecture-aware optimization: DISABLED")
 endif()
 
-# ----- Find dependencies -----
 
-find_package(ament_cmake REQUIRED)
-
-# Threads
-find_package(Threads REQUIRED)
-
-# OpenMP
-find_package(OpenMP REQUIRED)
-if(NOT TARGET OpenMP::OpenMP_CXX)
-  add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)
-  set_property(
-    TARGET OpenMP::OpenMP_CXX PROPERTY INTERFACE_LINK_LIBRARIES
-                                       ${OpenMP_CXX_FLAGS} Threads::Threads)
-endif()
-
-# Eigen
-find_package(Eigen3 3.3 REQUIRED)
-
-# OpenCV
-find_package(OpenCV 3.3.1 QUIET COMPONENTS core imgcodecs videoio features2d
-                                           calib3d highgui)
-if(NOT OpenCV_FOUND)
-  find_package(OpenCV 4.0 REQUIRED COMPONENTS core imgcodecs videoio features2d
-                                              calib3d highgui)
-  if(NOT OpenCV_FOUND)
-    message(FATAL_ERROR "OpenCV >= 3.3.1 not found")
-  endif()
-endif()
-message(STATUS "Use OpenCV ${OpenCV_VERSION}")
 
 # ----- Install configuration -----
 
