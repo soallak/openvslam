@@ -122,6 +122,12 @@ public:
     data::frame create_stereo_frame(const cv::Mat& left_img, const cv::Mat& right_img, const double timestamp, const cv::Mat& mask = cv::Mat{});
     std::shared_ptr<Mat44_t> feed_stereo_frame(const cv::Mat& left_img, const cv::Mat& right_img, const double timestamp, const cv::Mat& mask = cv::Mat{});
 
+    //! Feed a left image with the disparity
+    //! Left and disparity images must be aligned
+    //! Left image must be rectified
+    data::frame create_stereo_disparity_frame(const cv::Mat& left_img, const cv::Mat& disparity_img, const double timestamp, const cv::Mat& mask = cv::Mat{});
+    std::shared_ptr<Mat44_t> feed_stereo_disparity_frame(const cv::Mat& left_img, const cv::Mat& disparity_img, const double timestamp, const cv::Mat& mask = cv::Mat{});
+
     //! Feed an RGBD frame to SLAM system
     //! (Note: RGB and Depth images must be aligned)
     data::frame create_RGBD_frame(const cv::Mat& rgb_img, const cv::Mat& depthmap, const double timestamp, const cv::Mat& mask);

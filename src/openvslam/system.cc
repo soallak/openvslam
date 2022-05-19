@@ -371,12 +371,12 @@ data::frame system::create_stereo_frame(const cv::Mat& left_img, const cv::Mat& 
     });
     thread_left.join();
     thread_right.join();
-    end = now();
-    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:orb_feature_extraction");
     frm_obs.num_keypts_ = frm_obs.keypts_.size();
     if (frm_obs.keypts_.empty()) {
         spdlog::warn("preprocess: cannot extract any keypoints");
     }
+    end = now();
+    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:orb_feature_extraction");
 
     // Undistort keypoints
     start = now();
@@ -393,6 +393,82 @@ data::frame system::create_stereo_frame(const cv::Mat& left_img, const cv::Mat& 
     stereo_matcher.compute(frm_obs.stereo_x_right_, frm_obs.depths_);
     end = now();
     TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:stereo_matching");
+
+    // Convert to bearing vector
+    start = now();
+    camera_->convert_keypoints_to_bearings(frm_obs.undist_keypts_, frm_obs.bearings_);
+    end = now();
+    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:keypoints_to_bearings_conversion");
+
+    // Assign all the keypoints into grid
+    start = now();
+    data::assign_keypoints_to_grid(camera_, frm_obs.undist_keypts_, frm_obs.keypt_indices_in_cells_);
+    end = now();
+    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:keypoints_to_grid_assignment");
+
+    return data::frame(timestamp, camera_, orb_params_, frm_obs);
+}
+
+data::frame system::create_stereo_disparity_frame(const cv::Mat& left_img, const cv::Mat& disparity_img, const double timestamp, const cv::Mat& mask) {
+    // color conversion
+
+    auto now = std::chrono::steady_clock::now;
+
+    auto start = now();
+
+    cv::Mat img_gray = left_img;
+    util::convert_to_grayscale(img_gray, camera_->color_order_);
+
+    auto end = now();
+
+    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:grayscale_conversion");
+
+    data::frame_observation frm_obs;
+    //! keypoints of stereo right image
+    std::vector<cv::KeyPoint> keypts_right;
+    //! ORB descriptors of stereo right image
+    cv::Mat descriptors_right;
+
+    // Extract ORB feature
+    start = now();
+
+    extractor_left_->extract(img_gray, mask, frm_obs.keypts_, frm_obs.descriptors_);
+    frm_obs.num_keypts_ = frm_obs.keypts_.size();
+    if (frm_obs.keypts_.empty()) {
+        spdlog::warn("preprocess: cannot extract any keypoints");
+    }
+
+    end = now();
+    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:orb_feature_extraction");
+
+    // Undistort keypoints
+    start = now();
+    camera_->undistort_keypoints(frm_obs.keypts_, frm_obs.undist_keypts_);
+    end = now();
+    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:keypoints_undistortion");
+
+    start = now();
+    frm_obs.stereo_x_right_ = std::vector<float>(frm_obs.num_keypts_, -1);
+    frm_obs.depths_ = std::vector<float>(frm_obs.num_keypts_, -1);
+
+    for (unsigned int idx = 0; idx < frm_obs.num_keypts_; idx++) {
+        const auto& keypt = frm_obs.keypts_.at(idx);
+        const auto& undist_keypt = frm_obs.undist_keypts_.at(idx);
+
+        const float x = keypt.pt.x;
+        const float y = keypt.pt.y;
+
+        const float depth = camera_->focal_x_baseline_ / disparity_img.at<float>(y, x);
+
+        if (depth <= 0) {
+            continue;
+        }
+
+        frm_obs.depths_.at(idx) = depth;
+        frm_obs.stereo_x_right_.at(idx) = undist_keypt.pt.x - camera_->focal_x_baseline_ / depth;
+    }
+    end = now();
+    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:depth_conversion");
 
     // Convert to bearing vector
     start = now();
@@ -466,6 +542,12 @@ std::shared_ptr<Mat44_t> system::feed_monocular_frame(const cv::Mat& img, const 
 std::shared_ptr<Mat44_t> system::feed_stereo_frame(const cv::Mat& left_img, const cv::Mat& right_img, const double timestamp, const cv::Mat& mask) {
     assert(camera_->setup_type_ == camera::setup_type_t::Stereo);
     auto&& frame = create_stereo_frame(left_img, right_img, timestamp, mask);
+    return feed_frame(frame, left_img);
+}
+
+std::shared_ptr<Mat44_t> system::feed_stereo_disparity_frame(const cv::Mat& left_img, const cv::Mat& disparity_img, const double timestamp, const cv::Mat& mask) {
+    assert(camera_->setup_type_ == camera::setup_type_t::Stereo);
+    auto&& frame = create_stereo_disparity_frame(left_img, disparity_img, timestamp, mask);
     return feed_frame(frame, left_img);
 }
 
