@@ -340,20 +340,9 @@ data::frame system::create_monocular_frame(const cv::Mat& img, const double time
 }
 
 data::frame system::create_stereo_frame(const cv::Mat& left_img, const cv::Mat& right_img, const double timestamp, const cv::Mat& mask) {
-    // color conversion
+    assert(left_img.type() == CV_8UC1 && right_img.type() == CV_8UC1);
 
     auto now = std::chrono::steady_clock::now;
-
-    auto start = now();
-
-    cv::Mat img_gray = left_img;
-    cv::Mat right_img_gray = right_img;
-    util::convert_to_grayscale(img_gray, camera_->color_order_);
-    util::convert_to_grayscale(right_img_gray, camera_->color_order_);
-
-    auto end = now();
-
-    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:grayscale_conversion");
 
     data::frame_observation frm_obs;
     //! keypoints of stereo right image
@@ -362,12 +351,12 @@ data::frame system::create_stereo_frame(const cv::Mat& left_img, const cv::Mat& 
     cv::Mat descriptors_right;
 
     // Extract ORB feature
-    start = now();
-    std::thread thread_left([this, &frm_obs, &img_gray, &mask]() {
-        extractor_left_->extract(img_gray, mask, frm_obs.keypts_, frm_obs.descriptors_);
+    auto start = now();
+    std::thread thread_left([this, &frm_obs, &left_img, &mask]() {
+        extractor_left_->extract(left_img, mask, frm_obs.keypts_, frm_obs.descriptors_);
     });
-    std::thread thread_right([this, &frm_obs, &right_img_gray, &mask, &keypts_right, &descriptors_right]() {
-        extractor_right_->extract(right_img_gray, mask, keypts_right, descriptors_right);
+    std::thread thread_right([this, &right_img, &mask, &keypts_right, &descriptors_right]() {
+        extractor_right_->extract(right_img, mask, keypts_right, descriptors_right);
     });
     thread_left.join();
     thread_right.join();
@@ -375,7 +364,7 @@ data::frame system::create_stereo_frame(const cv::Mat& left_img, const cv::Mat& 
     if (frm_obs.keypts_.empty()) {
         spdlog::warn("preprocess: cannot extract any keypoints");
     }
-    end = now();
+    auto end = now();
     TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:orb_feature_extraction");
 
     // Undistort keypoints
@@ -410,18 +399,7 @@ data::frame system::create_stereo_frame(const cv::Mat& left_img, const cv::Mat& 
 }
 
 data::frame system::create_stereo_disparity_frame(const cv::Mat& left_img, const cv::Mat& disparity_img, const double timestamp, const cv::Mat& mask) {
-    // color conversion
-
-    auto now = std::chrono::steady_clock::now;
-
-    auto start = now();
-
-    cv::Mat img_gray = left_img;
-    util::convert_to_grayscale(img_gray, camera_->color_order_);
-
-    auto end = now();
-
-    TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:grayscale_conversion");
+    assert(left_img.type() == CV_8UC1 && disparity_img.type() == CV_32F);
 
     data::frame_observation frm_obs;
     //! keypoints of stereo right image
@@ -430,15 +408,16 @@ data::frame system::create_stereo_disparity_frame(const cv::Mat& left_img, const
     cv::Mat descriptors_right;
 
     // Extract ORB feature
-    start = now();
+    auto now = std::chrono::steady_clock::now;
+    auto start = now();
 
-    extractor_left_->extract(img_gray, mask, frm_obs.keypts_, frm_obs.descriptors_);
+    extractor_left_->extract(left_img, mask, frm_obs.keypts_, frm_obs.descriptors_);
     frm_obs.num_keypts_ = frm_obs.keypts_.size();
     if (frm_obs.keypts_.empty()) {
         spdlog::warn("preprocess: cannot extract any keypoints");
     }
 
-    end = now();
+    auto end = now();
     TP_COMPUTE_CPU(nullptr, std::chrono::nanoseconds(end - start), "slam:orb_feature_extraction");
 
     // Undistort keypoints
