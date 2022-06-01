@@ -29,7 +29,6 @@
 
 // clang-format off
 // todo: make this conditional at compile time
-#define LTTNG_UST_TRACEPOINT_DEFINE
 #define LTTNG_UST_TRACEPOINT_PROBE_DYNAMIC_LINKAGE
 #include <slam_tracepoint_provider/tracepoint.hpp>
 // clang-format on
