@@ -140,7 +140,7 @@ Equirectangular Datasets
       - `link <https://pan.baidu.com/s/1a43ykBO2ObIle8S7FmvO0Q>`__ (Pass: kghc)
     * - ALL
       - equirectangular (mono)
-      - 
+      -
       - `link <https://drive.google.com/open?id=1A_gq8LYuENePhNHsuscLZQPhbJJwzAq4>`__
       - `link <https://pan.baidu.com/s/1a6BCfQKpwhzlevZx1VkSZw>`__ (Pass: vsv7)
 
@@ -208,7 +208,7 @@ Fisheye Datasets
       - `link <https://pan.baidu.com/s/1cYEXzwYdr4YAjI6E_4B6wA>`__ (Pass: btpj)
     * - ALL
       - fisheye (mono)
-      - 
+      -
       - `link <https://drive.google.com/open?id=1SVDsgz-ydm1pAbrdmhRQTmWhJnUl_xr8>`__
       - `link <https://pan.baidu.com/s/11gqp2t-A2kHRntyN8ueqSQ>`__ (Pass: gumj)
 
@@ -289,11 +289,11 @@ If the two viewers are not launching correctly, check if you launched the comman
 .. code-block:: none
 
     [2019-05-20 17:52:41.677] [I] config file loaded: /path/to/openvslam/example/aist/equirectangular.yaml
-      ___               __   _____ _      _   __  __  
-     / _ \ _ __  ___ _ _\ \ / / __| |    /_\ |  \/  | 
-    | (_) | '_ \/ -_) ' \\ V /\__ \ |__ / _ \| |\/| | 
-     \___/| .__/\___|_||_|\_/ |___/____/_/ \_\_|  |_| 
-          |_|                                         
+      ___               __   _____ _      _   __  __
+     / _ \ _ __  ___ _ _\ \ / / __| |    /_\ |  \/  |
+    | (_) | '_ \/ -_) ' \\ V /\__ \ |__ / _ \| |\/| |
+     \___/| .__/\___|_||_|\_/ |___/____/_/ \_\_|  |_|
+          |_|
 
     Copyright (C) 2019,
     National Institute of Advanced Industrial Science and Technology (AIST)
@@ -422,11 +422,11 @@ You can see if the current frame is being localized, based on the prebuild map.
 .. code-block:: none
 
     [2019-05-20 17:58:54.728] [I] config file loaded: /path/to/openvslam/example/aist/equirectangular.yaml
-      ___               __   _____ _      _   __  __  
-     / _ \ _ __  ___ _ _\ \ / / __| |    /_\ |  \/  | 
-    | (_) | '_ \/ -_) ' \\ V /\__ \ |__ / _ \| |\/| | 
-     \___/| .__/\___|_||_|\_/ |___/____/_/ \_\_|  |_| 
-          |_|                                         
+      ___               __   _____ _      _   __  __
+     / _ \ _ __  ___ _ _\ \ / / __| |    /_\ |  \/  |
+    | (_) | '_ \/ -_) ' \\ V /\__ \ |__ / _ \| |\/| |
+     \___/| .__/\___|_||_|\_/ |___/____/_/ \_\_|  |_|
+          |_|
 
     Copyright (C) 2019,
     National Institute of Advanced Industrial Science and Technology (AIST)

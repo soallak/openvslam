@@ -21,7 +21,7 @@ mkdir $TOPDIR/vocab
     CODE="$(awk '/_warning_/ {print $NF}' /tmp/cookie)"
     curl -sLb /tmp/cookie "https://drive.google.com/uc?export=download&confirm=${CODE}&id=${FILE_ID}" -o aist_living_lab_1.zip
     unzip aist_living_lab_1.zip
-    
+
     FILE_ID="1TVf2D2QvMZPHsFoTb7HNxbXclPoFMGLX"
     curl -sc /tmp/cookie "https://drive.google.com/uc?export=download&id=${FILE_ID}" > /dev/null
     CODE="$(awk '/_warning_/ {print $NF}' /tmp/cookie)"

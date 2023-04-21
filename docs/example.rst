@@ -257,8 +257,8 @@ TUM RGBD dataset
 `TUM RGBD dataset <https://vision.in.tum.de/data/datasets/rgbd-dataset>`_ is a benchmarking dataset fcontaining RGB-D data and ground-truth data with the goal to establish a novel benchmark for the evaluation of visual odometry and visual SLAM systems.
 The source code is placed at ``./example/run_tum_rgbd_localization.cc``.
 
-Start by downloading the various dataset from `here <https://vision.in.tum.de/data/datasets/rgbd-dataset/download>`__. 
-One of many example datasets can be found from  `here <https://vision.in.tum.de/rgbd/dataset/freiburg3/rgbd_dataset_freiburg3_calibration_rgb_depth.tgz>`__. 
+Start by downloading the various dataset from `here <https://vision.in.tum.de/data/datasets/rgbd-dataset/download>`__.
+One of many example datasets can be found from  `here <https://vision.in.tum.de/rgbd/dataset/freiburg3/rgbd_dataset_freiburg3_calibration_rgb_depth.tgz>`__.
 Download the ``.tgz`` file of a dataset you plan on using.
 
 After downloading and uncompressing it, you will find two directories and few text files under the ``rgbd_dataset_freiburg3_calibration_rgb_depth/`` directory.

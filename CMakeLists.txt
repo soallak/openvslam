@@ -62,11 +62,11 @@ message(STATUS "Use OpenCV ${OpenCV_VERSION}")
 find_package(Pangolin QUIET)
 
 set(USE_PANGOLIN_VIEWER
-  ${Pangolin_FOUND}
-  CACHE BOOL "Enable Pangolin Viewer")
+    ${Pangolin_FOUND}
+    CACHE BOOL "Enable Pangolin Viewer")
 set(INSTALL_PANGOLIN_VIEWER
-  ${Pangolin_FOUND}
-  CACHE BOOL "Install PangolinViewer library")
+    ${Pangolin_FOUND}
+    CACHE BOOL "Install PangolinViewer library")
 
 set(USE_SOCKET_PUBLISHER
     OFF
@@ -154,8 +154,6 @@ if(BUILD_WITH_MARCH_NATIVE AND NOT MSVC)
 else()
   message(STATUS "Architecture-aware optimization: DISABLED")
 endif()
-
-
 
 # ----- Install configuration -----
 

@@ -7,18 +7,18 @@
 namespace DBoW2 {
 class FORB;
 // class FORB::TDescriptor; // can't do forward declaration for inner class.
-template<class TDescriptor, class F>
+template <class TDescriptor, class F>
 class TemplatedVocabulary;
 class BowVector;
 class FeatureVector;
-} // namespace DBoW2
+}  // namespace DBoW2
 #else
 namespace fbow {
 class Vocabulary;
 class BoWVector;
 class BoWFeatVector;
-} // namespace fbow
-#endif // USE_DBOW2
+}  // namespace fbow
+#endif  // USE_DBOW2
 
 namespace openvslam {
 namespace data {
@@ -36,9 +36,9 @@ typedef fbow::Vocabulary bow_vocabulary;
 typedef fbow::BoWVector bow_vector;
 typedef fbow::BoWFeatVector bow_feature_vector;
 
-#endif // USE_DBOW2
+#endif  // USE_DBOW2
 
-} // namespace data
-} // namespace openvslam
+}  // namespace data
+}  // namespace openvslam
 
-#endif // OPENVSLAM_DATA_BOW_VOCABULARY_FWD_H
+#endif  // OPENVSLAM_DATA_BOW_VOCABULARY_FWD_H

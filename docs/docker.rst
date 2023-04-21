@@ -19,7 +19,7 @@ Docker for Mac are NOT supported due to OpenGL forwarding.
 Note that **docker host machines with NVIDIA graphics cards are NOT officially supported yet.**
 
 .. NOTE ::
-    If you're using Ubuntu, there are easy setup scripts in scripts/ubuntu. see scripts/ubuntu/README.md  
+    If you're using Ubuntu, there are easy setup scripts in scripts/ubuntu. see scripts/ubuntu/README.md
 
     If you plan on using a machine with NVIDIA graphics card(s), please use `nvidia-docker2 <https://github.com/NVIDIA/nvidia-docker>`_ and the version 390 or later of NVIDIA driver.
     These examples depend on X11 forwarding with OpenGL for visualization.
@@ -59,7 +59,7 @@ In order to enable X11 forwarding, supplemental options (``-e DISPLAY=$DISPLAY``
 
 .. NOTE ::
 
-    Additional option ``--runtime=nvidia`` is needed if you use NVIDIA graphics card(s).  
+    Additional option ``--runtime=nvidia`` is needed if you use NVIDIA graphics card(s).
     If you're using Docker with **Native GPU Support** then the options are ``--gpus all``.
     Please see `here <https://github.com/NVIDIA/nvidia-docker/wiki/Installation-(Native-GPU-Support)#usage>`_ for more details.
 

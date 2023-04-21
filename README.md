@@ -56,7 +56,7 @@ Please see the `*.cc` files in `./example` directory or check [Simple Tutorial](
 
 ## Motivation
 
-Visual SLAM is regarded as a next-generation technology for supporting industries such as automotives, robotics, and xR. 
+Visual SLAM is regarded as a next-generation technology for supporting industries such as automotives, robotics, and xR.
 We released OpenVSLAM as an opensource project with the aim of collaborating with people around the world to accelerate the development of this field.
 In return, we hope this project will bring safe and reliable technologies for a better society.
 

@@ -8,7 +8,7 @@ cd %openvslam_root%
 
 if "%param_1%" == "" (
     echo No option specified
-    echo options are: 
+    echo options are:
     echo.
     echo setup      Build dependencies for openvslam
     echo debug      Build openvslam in debug mode
@@ -50,7 +50,7 @@ if "%param_1%" == "debug" (
 
     mkdir build
     cd build
-    
+
     cmake -S .. --preset=msvc-x64-static-debug
 
     cd msvc-x64-static-debug

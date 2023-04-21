@@ -12,12 +12,12 @@ Relocalization
 What is Relocalization? Why it is needed?
 =========================================
 
-In Visual SLAM, the robot/camera explores its environment while 
+In Visual SLAM, the robot/camera explores its environment while
 
 1. estimates its location using the map and the last location as prior information (Tracking), and simultaneously
 2. update the map (the database that records landmarks) of environment (Mapping).
 
-Relocalization module can estimate the location without using any prior information other than the map (with the high cost of computation). 
+Relocalization module can estimate the location without using any prior information other than the map (with the high cost of computation).
 This is useful when the previous location cannot be used as prior information, for example when tracking fails.
 
 
@@ -53,4 +53,3 @@ Steps in Relocalization
 .. _section-run-relocalizatoin:
 
 | See the details on how to run the relocalization at `here <https://openvslam-community.readthedocs.io/en/latest/simple_tutorial.html#simple-tutorial>`__.
-

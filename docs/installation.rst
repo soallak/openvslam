@@ -129,7 +129,7 @@ Install the dependencies via ``apt``.
     # eigen dependencies
     apt install -y gfortran
     # other dependencies
-    apt install -y libyaml-cpp-dev libgoogle-glog-dev libgflags-dev 
+    apt install -y libyaml-cpp-dev libgoogle-glog-dev libgflags-dev
 
     # (if you plan on using PangolinViewer)
     # Pangolin dependencies

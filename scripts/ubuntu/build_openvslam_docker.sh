@@ -2,7 +2,7 @@
 
 TOPDIR="$(dirname $(realpath "$0"))"/../../ #openvslam directory
 
-( 
+(
     cd $TOPDIR
 
     # Building Docker Image

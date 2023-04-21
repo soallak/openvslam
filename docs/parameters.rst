@@ -121,7 +121,7 @@ Mapping
     * - baseline_dist_thr
       - For two frames of baseline below the threshold, no triangulation will be performed.
     * - redundant_obs_ratio_thr
-      - 
+      -
 
 .. _section-parameters-stereo-rectifier:
 
@@ -170,13 +170,13 @@ Relocalizer
     * - Name
       - Description
     * - bow_match_lowe_ratio
-      - 
+      -
     * - proj_match_lowe_ratio
-      - 
+      -
     * - min_num_bow_matches
-      - 
+      -
     * - min_num_valid_obs
-      - 
+      -
 
 .. _section-parameters-keyframe-inserter:
 
@@ -208,19 +208,19 @@ PangolinViewer
     * - Name
       - Description
     * - keyframe_size
-      - 
+      -
     * - keyframe_line_width
-      - 
+      -
     * - graph_line_width
-      - 
+      -
     * - point_size
-      - 
+      -
     * - camera_size
-      - 
+      -
     * - camera_line_width
-      - 
+      -
     * - viewpoint_x, viewpoint_y, viewpoint_z, viewpoint_f
-      - 
+      -
 
 .. _section-parameters-socket-publisher:
 
@@ -234,11 +234,11 @@ SocketPublisher
     * - Name
       - Description
     * - emitting_interval
-      - 
+      -
     * - image_quality
-      - 
+      -
     * - server_uri
-      - 
+      -
     * - publish_points
       - If true, pointcloud transfer is enabled. The default is true. Pointcloud transfer is slow, so disabling pointcloud transfer may be useful to improve performance of SocketViewer.
 
@@ -272,6 +272,6 @@ BowDatabase
     * - Name
       - Description
     * - reject_by_graph_distance
-      - 
+      -
     * - loop_min_distance_on_graph
-      - 
+      -
