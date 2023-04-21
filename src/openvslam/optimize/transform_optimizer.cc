@@ -10,6 +10,7 @@
 #include <g2o/core/robust_kernel_impl.h>
 #include <g2o/solvers/eigen/linear_solver_eigen.h>
 #include <g2o/core/optimization_algorithm_levenberg.h>
+#include <memory>
 
 namespace openvslam {
 namespace optimize {
@@ -24,8 +25,8 @@ unsigned int transform_optimizer::optimize(const std::shared_ptr<data::keyframe>
 
     // 1. Construct an optimizer
 
-    auto linear_solver = g2o::make_unique<g2o::LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>>();
-    auto block_solver = g2o::make_unique<g2o::BlockSolverX>(std::move(linear_solver));
+    auto linear_solver = std::make_unique<g2o::LinearSolverEigen<g2o::BlockSolverX::PoseMatrixType>>();
+    auto block_solver = std::make_unique<g2o::BlockSolverX>(std::move(linear_solver));
     auto algorithm = new g2o::OptimizationAlgorithmLevenberg(std::move(block_solver));
 
     g2o::SparseOptimizer optimizer;
